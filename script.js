@@ -1,28 +1,18 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const keys = document.querySelectorAll('.key');
+//your JS code here. If required.
+function playSound(e) {
+    const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+    const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
+    if (!audio) return;
+    audio.currentTime = 1;
+    audio.play();
+    key.classList.add('playing');
+}
 
-    // Add event listener for keydown event
-    window.addEventListener('keydown', playSound);
-    
-    function playSound(e) {
-        const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
-        if (key) {
-            if (window.Cypress) {
-                // Skip audio playback in Cypress tests
-                console.log(`Sound for key ${key.dataset.key} would play here.`);
-            } else {
-                // Normal audio playback
-                const audio = new Audio(`sounds/${key.dataset.key}.mp3`);
-                audio.play();
-            }
-            key.classList.add('playing');
-        }
-    }
-    
-    // Remove the 'playing' class after animation ends
-    keys.forEach(key => {
-        key.addEventListener('transitionend', () => {
-            key.classList.remove('playing');
-        });
-    });
-});
+function removeTransition(e) {
+    if (e.propertyName !== 'transform') return;
+    this.classList.remove('playing');
+}
+
+const keys = document.querySelectorAll('.key');
+keys.forEach(key => key.addEventListener('transitionend', removeTransition));
+window.addEventListener('keydown', playSound);
